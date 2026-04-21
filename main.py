@@ -1,26 +1,30 @@
 import pandas as pd
-import numpy as np
+import matplotlib.pyplot as plt
 
-# 1. Criando dados fictícios para o projeto
+# 1. Dados de exemplo
 data = {
-    'id_transacao': range(1, 11),
-    'valor': [10.50, 15.00, 12.00, 5000.00, 14.20, 11.00, 13.50, 8000.00, 10.00, 12.50],
-    'tempo_dia': [10, 11, 12, 3, 14, 15, 16, 2, 18, 19] # Hora da transação
+    'transacao': range(1, 11),
+    'valor': [10.5, 15.2, 12.0, 5000.0, 14.2, 11.0, 13.5, 8000.0, 10.0, 12.5]
 }
-
 df = pd.DataFrame(data)
 
-print("--- Primeiras linhas do dataset ---")
-print(df.head())
+# 2. Definindo limite para anomalias
+limite = 1000
+df['anomalia'] = df['valor'] > limite
 
-# 2. Uma lógica simples de detecção (Regra de Negócio)
-# Vamos considerar anomalia qualquer valor acima de 1000 reais
-# ou transações feitas na madrugada (entre 0h e 5h)
-limite_valor = 1000
+# 3. Criando a visualização
+plt.figure(figsize=(10, 6))
+cores = ['blue' if not x else 'red' for x in df['anomalia']]
 
-print(f"\nBuscando transações acima de R$ {limite_valor} ou em horários suspeitos...")
+plt.scatter(df['transacao'], df['valor'], c=cores, s=100)
+plt.axhline(y=limite, color='r', linestyle='--', label='Limite de Alerta')
 
-anomalias = df[(df['valor'] > limite_valor) | (df['tempo_dia'] < 5)]
+plt.title('Detecção de Anomalias em Transações Financeiras')
+plt.xlabel('Número da Transação')
+plt.ylabel('Valor (R$)')
+plt.legend()
 
-print("\n--- Anomalias Detectadas ---")
-print(anomalias)
+# Salva o gráfico como imagem para o portfólio
+plt.savefig('resultado_anomalias.png')
+print("Análise concluída. Imagem 'resultado_anomalias.png' gerada.")
+print(df[df['anomalia'] == True])
